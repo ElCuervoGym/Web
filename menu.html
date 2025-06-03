@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Menú Socio - El Cuervo Gym</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" type="image/x-icon" href="images/logo.ico" />
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+  <style>
+    body {
+      background-image: url('images/BG.png');
+      background-size: cover;
+      background-position: center;
+    }
+
+    .card-header img {
+      max-height: 150px;
+      max-width: 150px;
+    }
+
+    .navbar-brand img {
+      height: 30px;
+      width: 30px;
+    }
+
+    /* Ajustar altura navbar para que el botón quede bien */
+    .navbar-nav {
+      align-items: center;
+    }
+
+    #btn-logout {
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <a class="navbar-brand" href="menu.html">
+        <img src="images/Cuervo Gym.png" alt="El Cuervo Gym" class="d-inline-block align-top" />
+        El Cuervo Gym
+      </a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <span id="saludo-usuario" class="navbar-text text-white mr-3">Hola, Usuario!</span>
+          </li>
+          <li class="nav-item">
+            <button id="btn-logout" class="btn btn-outline-light nav-link px-3">Cerrar Sesión</button>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  </header>
+
+  <main class="container mt-5">
+    <h2 class="mb-4">Detalles de Tu Membresía</h2>
+
+    <div id="datosSocio" class="card mb-4 d-none">
+      <div class="card-body" id="socioBody"></div>
+    </div>
+
+    <h3 class="mb-3">Últimos Pagos</h3>
+    <div id="tablaPagosContainer"></div>
+  </main>
+
+  <script>
+    function formatDate(isoDate) {
+      if (!isoDate) return "";
+      const date = new Date(isoDate);
+      const day = String(date.getDate()).padStart(2, "0");
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const year = date.getFullYear();
+      return `${day}/${month}/${year}`;
+    }
+
+    const socioId = sessionStorage.getItem("IdSocio");
+
+    if (!socioId) {
+      window.location.href = "/CuervoGym/index.html";
+    } else {
+      fetch(`https://179.41.13.9:7019/api/socios/${socioId}`)
+        .then(res => res.json())
+        .then(socio => {
+          const body = document.getElementById("socioBody");
+          body.innerHTML = `
+            <h5 class="card-title">${socio.nombre} ${socio.apellido}</h5>
+            <p class="card-text"><strong>Documento:</strong> ${socio.documento}</p>
+            <p class="card-text"><strong>Número de Socio:</strong> ${socio.id}</p>
+            <p class="card-text"><strong>Teléfono:</strong> ${socio.telefono}</p>
+            <p class="card-text"><strong>Obra Social:</strong> ${socio.obraSocial}</p>
+            <p class="card-text"><strong>Número de Obra Social:</strong> ${socio.numeroObraSocial}</p>
+            <p class="card-text"><strong>Número de Emergencia:</strong> ${socio.numeroEmergencia}</p>
+            <p class="card-text"><strong>Contacto de Emergencia:</strong> ${socio.contactoEmergencia}</p>
+            <p class="card-text"><strong>Fecha de Subscripción:</strong> ${formatDate(socio.fechaSubscripcion)}</p>
+            <p class="card-text"><strong>Próximo Vencimiento de Cuota:</strong> ${formatDate(socio.proximoVencimientoCuota)}</p>
+          `;
+          document.getElementById("datosSocio").classList.remove("d-none");
+
+          const pagos = socio.ultimosPagos;
+          const pagosHTML = pagos?.length
+            ? `
+              <table class="table table-striped">
+                <thead class="table-dark">
+                  <tr>
+                    <th>Fecha de Pago</th>
+                    <th>Monto</th>
+                    <th>Tipo de Pago</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${pagos.map(p => `
+                    <tr>
+                      <td>${formatDate(p.fechaPago)}</td>
+                      <td>$ ${p.monto.toFixed(2)}</td>
+                      <td>${p.metodoPago}</td>
+                    </tr>`).join("")}
+                </tbody>
+              </table>
+            `
+            : `<p>No tienes pagos registrados.</p>`;
+
+          document.getElementById("tablaPagosContainer").innerHTML = pagosHTML;
+        });
+    }
+
+    document.getElementById('btn-logout').addEventListener('click', () => {
+      sessionStorage.clear();
+      window.location.href = '/CuervoGym/index.html';
+    });
+  </script>
+
+</body>
+
+</html>
