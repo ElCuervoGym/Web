@@ -84,7 +84,7 @@
     const socioId = sessionStorage.getItem("IdSocio");
 
     if (!socioId) {
-      window.location.href = "/CuervoGym/index.html";
+      window.location.href = "/Web/index.html";
     } else {
       fetch(`https://179.41.13.9:7019/api/socios/${socioId}`)
         .then(res => res.json())
@@ -133,7 +133,7 @@
 
     document.getElementById('btn-logout').addEventListener('click', () => {
       sessionStorage.clear();
-      window.location.href = '/CuervoGym/index.html';
+      window.location.href = '/Web/index.html';
     });
   </script>
 

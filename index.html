@@ -84,9 +84,9 @@
 
                 const params = new URLSearchParams(window.location.search);
                 if (params.get('qr') === 'true') {
-                    window.location.href = '/CuervoGym/ingreso-qr.html';
+                    window.location.href = '/Web/ingreso-qr.html';
                 } else {
-                    window.location.href = '/CuervoGym/menu.html';
+                    window.location.href = '/Web/menu.html';
                 }
             } catch (err) {
                 errorDiv.textContent = 'No se pudo conectar con el servidor.';
